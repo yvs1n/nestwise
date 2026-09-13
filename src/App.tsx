@@ -45,6 +45,7 @@ export default function App() {
   const notify = (message: string) => { setToast(message); window.setTimeout(() => setToast(''), 2400) }
   const closeTour = () => { localStorage.setItem('nestwise-tour-seen', 'true'); setTourOpen(false); setTourStep(0) }
   const replayTour = () => { localStorage.removeItem('nestwise-tour-seen'); setTourStep(0); setTourOpen(true) }
+  const resetDemo = () => { localStorage.removeItem('nestwise-university'); localStorage.removeItem('nestwise-tour-seen'); setUniversityId('uos'); setView('overview'); setBills(true); setChecklist([true, false, false, false]); setTourStep(0); setTourOpen(true); notify('Demo reset to University of Sharjah') }
   const nav = [{ id: 'overview' as View, label: 'Overview', icon: '⌂' }, { id: 'compare' as View, label: 'Compare homes', icon: '⇄' }, { id: 'decoder' as View, label: 'Lease decoder', icon: '▤' }, { id: 'fit' as View, label: 'Roommate & fit', icon: '♧' }, { id: 'problem' as View, label: 'Problem & Solution', icon: '◈' }]
   const toggleCompare = (id: string) => setCompare(prev => prev.includes(id) ? prev.filter(x => x !== id) : prev.length < 3 ? [...prev, id] : prev)
 
@@ -64,7 +65,7 @@ export default function App() {
         {view === 'fit' && <Fit university={university} onNotify={notify} />}
         {view === 'problem' && <Problem />}
       </div>
-      <footer className="app-footer">Built with care by <strong>nestwise</strong> · <a href="https://www.linkedin.com/" target="_blank" rel="noreferrer">Visit the creator portfolio ↗</a><button onClick={replayTour}>Replay help tour</button></footer>
+      <footer className="app-footer"><span>Built by <strong>Yassin Ragab</strong> · Computer Engineering student at University of Sharjah</span><a href="https://yassinr.me" target="_blank" rel="noopener noreferrer">Portfolio ↗</a><button onClick={replayTour}>Replay tutorial</button><button onClick={resetDemo}>Reset demo</button></footer>
     </main>
     {setupOpen && <Setup university={university} onClose={() => setSetupOpen(false)} onDone={(id) => { setUniversityId(id); setSetupOpen(false); notify('Your AED housing plan is updated') }} />}
     {tourOpen && <Tour step={tourStep} setStep={setTourStep} onClose={closeTour} />}
@@ -111,7 +112,13 @@ function Setup({ university, onClose, onDone }: { university: University; onClos
 }
 
 function Tour({ step, setStep, onClose }: { step: number; setStep: (n: number) => void; onClose: () => void }) {
-  const slides = [{ title: 'Welcome to nestwise', text: 'Compare real student homes with the full monthly picture — not just the headline rent.' }, { title: 'Choose your context', text: 'Pick UOS, AUS or RIT Dubai to update campus, commute and realistic UAE housing examples.' }, { title: 'Make progress, calmly', text: 'Use the decoder and life-fit tools to turn uncertainty into your next clear step.' }]
+  const slides = [
+    { title: 'Welcome to nestwise', text: 'A calm student housing decision tool built around the True Cost Lens.' },
+    { title: 'Start with setup', text: 'Choose UOS, AUS or RIT Dubai and tune your campus, budget and housing context.' },
+    { title: 'See the true cost', text: 'Compare AED rent, bills, internet and commute together — with demo and estimated labels.' },
+    { title: 'Feel the commute tradeoff', text: 'Use Life Fit to weigh time, space and money against the way you want your week to feel.' },
+    { title: 'Decode before you commit', text: 'Turn lease small print into a simple checklist, then explore roommate fit and your next best action.' },
+  ]
   const slide = slides[step]
-  return <div className="modal-backdrop tour-backdrop"><div className="setup-modal tour-modal" role="dialog" aria-modal="true" aria-labelledby="tour-title"><button className="modal-close" onClick={onClose} aria-label="Dismiss walkthrough">×</button><div className="ask-orb">✦</div><div className="setup-kicker">NESTWISE WALKTHROUGH · 0{step + 1}/03</div><h2 id="tour-title">{slide.title}</h2><p>{slide.text}</p><div className="tour-dots">{slides.map((_, i) => <i key={i} className={i === step ? 'active' : ''}></i>)}</div><div className="modal-actions"><button className="text-btn" onClick={onClose}>Skip</button><button className="primary-btn" onClick={() => step === slides.length - 1 ? onClose() : setStep(step + 1)}>{step === slides.length - 1 ? 'Start exploring' : 'Next →'}</button></div></div></div>
+  return <div className="modal-backdrop tour-backdrop"><div className="setup-modal tour-modal" role="dialog" aria-modal="true" aria-labelledby="tour-title"><button className="modal-close" onClick={onClose} aria-label="Dismiss walkthrough">×</button><div className="ask-orb">✦</div><div className="setup-kicker">NESTWISE WALKTHROUGH · 0{step + 1}/{String(slides.length).padStart(2, '0')}</div><h2 id="tour-title">{slide.title}</h2><p>{slide.text}</p><div className="tour-dots">{slides.map((_, i) => <i key={i} className={i === step ? 'active' : ''}></i>)}</div><div className="modal-actions"><button className="text-btn" onClick={onClose}>Skip</button><button className="primary-btn" onClick={() => step === slides.length - 1 ? onClose() : setStep(step + 1)}>{step === slides.length - 1 ? 'Start exploring' : 'Next →'}</button></div></div></div>
 }
